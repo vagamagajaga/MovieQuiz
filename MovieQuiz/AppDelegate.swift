@@ -3,7 +3,7 @@
 //  MovieQuiz
 //
 //  Created by Constantine Nikolsky on 15.05.2022.
-//
+// от 15 октября, скачен через ссылкуот гита
 
 import UIKit
 
@@ -11,6 +11,7 @@ import UIKit
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        print("Hello world")
         return true
     }
 
