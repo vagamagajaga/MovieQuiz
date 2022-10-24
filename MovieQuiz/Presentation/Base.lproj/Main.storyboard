@@ -26,7 +26,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="Vtk-vg-255">
-                                <rect key="frame" x="20" y="54" width="374" height="798"/>
+                                <rect key="frame" x="20" y="54" width="374" height="808"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="obq-fO-Qa2">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="23.5"/>
@@ -58,22 +58,24 @@
                                         </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jPU-yi-VYP" userLabel="Text Label">
-                                        <rect key="frame" x="0.0" y="624.5" width="374" height="93.5"/>
+                                        <rect key="frame" x="0.0" y="624.5" width="374" height="103.5"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8dU-ca-EEV" userLabel="Question Label">
-                                                <rect key="frame" x="42" y="13" width="290" height="67.5"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8dU-ca-EEV" userLabel="Question Label">
+                                                <rect key="frame" x="20" y="5" width="334" height="93.5"/>
                                                 <fontDescription key="fontDescription" name="YSDisplay-Bold" family="YS Display" pointSize="23"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="8dU-ca-EEV" firstAttribute="top" secondItem="jPU-yi-VYP" secondAttribute="top" constant="13" id="2Xv-Pu-t7T"/>
-                                            <constraint firstAttribute="bottom" secondItem="8dU-ca-EEV" secondAttribute="bottom" constant="13" id="NgQ-Ky-B0m"/>
+                                            <constraint firstItem="8dU-ca-EEV" firstAttribute="top" secondItem="jPU-yi-VYP" secondAttribute="top" constant="5" id="2Xv-Pu-t7T"/>
+                                            <constraint firstAttribute="trailing" secondItem="8dU-ca-EEV" secondAttribute="trailing" constant="20" id="JfV-Sj-p84"/>
+                                            <constraint firstAttribute="bottom" secondItem="8dU-ca-EEV" secondAttribute="bottom" constant="5" id="NgQ-Ky-B0m"/>
+                                            <constraint firstItem="8dU-ca-EEV" firstAttribute="leading" secondItem="jPU-yi-VYP" secondAttribute="leading" constant="20" id="VxP-wP-Xk0"/>
                                         </constraints>
                                     </view>
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="3cw-NE-Fan">
-                                        <rect key="frame" x="0.0" y="738" width="374" height="60"/>
+                                        <rect key="frame" x="0.0" y="748" width="374" height="60"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Thd-pi-yP2" userLabel="No button">
                                                 <rect key="frame" x="0.0" y="0.0" width="177" height="60"/>
@@ -117,19 +119,15 @@
                                         </constraints>
                                     </stackView>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="8dU-ca-EEV" secondAttribute="trailing" constant="42" id="gvN-da-yHJ"/>
-                                    <constraint firstItem="8dU-ca-EEV" firstAttribute="leading" secondItem="Vtk-vg-255" secondAttribute="leading" constant="42" id="ouf-44-s5n"/>
-                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" name="background"/>
+                        <color key="backgroundColor" name="ypBlack"/>
                         <constraints>
                             <constraint firstItem="Vtk-vg-255" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="25d-kt-3YC"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Vtk-vg-255" secondAttribute="trailing" constant="20" id="gjL-6X-jhc"/>
                             <constraint firstItem="Vtk-vg-255" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="hFY-iK-3D1"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Vtk-vg-255" secondAttribute="bottom" constant="10" id="yOs-YN-5Vh"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Vtk-vg-255" secondAttribute="bottom" id="yOs-YN-5Vh"/>
                         </constraints>
                     </view>
                     <connections>
@@ -144,8 +142,8 @@
         </scene>
     </scenes>
     <resources>
-        <namedColor name="background">
-            <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="ypBlack">
+            <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
