@@ -9,6 +9,5 @@ import Foundation
 import UIKit
 
 protocol AlertPresenterProtocol: AnyObject {
-    
     func present(model: AlertModel)
 }

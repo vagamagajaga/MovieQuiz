@@ -46,7 +46,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.showNextQuestionOrResults()
         }
     }
-  
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
@@ -67,7 +66,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             statisticService.store(correct: correctAnswers, total: questionsAmount)
             let text = """
 Ваш результат: \(correctAnswers) из 10
-Кличество сыгранных квизов: \(statisticService.gamesCount)
+Количество сыграных квизов: \(statisticService.gamesCount)
 Рекорд: \(statisticService.bestGame.correct ) /\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
 Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
 """
@@ -79,7 +78,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                     self.currentQuestionIndex = 0
                     return self.questionFactory?.requestNextQuestion()
                 }
-            
             alertPresenter?.present(model: alertModel)
             correctAnswers = 0
         } else {
@@ -96,54 +94,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         self.alertPresenter = AlertPresenter(viewController: self)
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
-        
-        
-//        print(NSHomeDirectory())
-//        UserDefaults.standard.set(true, forKey: "viewDidLoad")
-//        print(Bundle.main.bundlePath)
-//
-//        var fileJsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        let jsonStringfile = "top250MoviesIMDB.json"
-//        fileJsonURL.appendPathComponent(jsonStringfile)
-//        let jsonString = try! String(contentsOf: fileJsonURL)
-//        let data = jsonString.data(using: .utf8)!
-//
-//        var nedeedCrew: String
-//
-//        struct Top: Decodable {
-//            let items: [Movie]
-//        }
-//
-//        struct Actor: Decodable {
-//            let id: String
-//            let image: String
-//            let name: String
-//            let asCharacter: String
-//        }
-//
-//        struct Movie: Decodable {
-//          let id: String
-//          let rank: String
-//          let title: String
-//          let fullTitle: String
-//          let year: String
-//          let image: String
-//          let crew: String
-//          let imDbRating: String
-//          let imDbRatingCount: String
-//        }
-//
-//
-//
-//        do {
-//            let result = try JSONDecoder().decode(Top.self, from: data)
-//            nedeedCrew = result.items[0].crew
-//            print(nedeedCrew)
-//        } catch {
-//            print("Failed to parse: \(error.localizedDescription)")
-//        }
-        
-        
     }
     // MARK: - QuestionFactoryDelegate
   
