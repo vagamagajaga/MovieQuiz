@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
-protocol AlertPresenterProtocol {
-   func present(alert: AlertModel)
+protocol AlertPresenterProtocol: AnyObject {
+    
+    func present(model: AlertModel)
 }

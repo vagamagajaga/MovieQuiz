@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - Outlets
 
@@ -9,6 +9,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet private weak var movieCount: UILabel!
     
     // MARK: - Variables
+    private var statisticService: StatisticServiceProtocol = StatisticServiceImplementation()
     private var alertPresenter: AlertPresenterProtocol?
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
@@ -61,46 +62,87 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         movieCount.text = convert(model: currentQuestion).questionNumber
     }
     
-    private func showResult(quiz result: QuizResultsViewModel) {
-        
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-        
-        let action = UIAlertAction(
-            title: result.buttonText,
-            style: .default) { [weak self]  _ in
-                guard let self = self  else { return }
-                self.currentQuestionIndex = 0
-                self.questionFactory?.requestNextQuestion()
-            }
-        
-        alert.addAction(action)
-        self.present(alert, animated: true, completion: nil)
-    }
-    
     private func showNextQuestionOrResults() {
-      if currentQuestionIndex == questionsAmount - 1 {
-          let text = "Ваш результат: \(correctAnswers) из 10"
-          let resultViewModel: QuizResultsViewModel = QuizResultsViewModel(
-            title: "Этот раунд окончен!",
-            text: text,
-            buttonText: "Сыграть еще раз")
-          showResult(quiz: resultViewModel)
-          correctAnswers = 0
-      } else {
-        currentQuestionIndex += 1
-          questionFactory?.requestNextQuestion()
-      }
+        if currentQuestionIndex == questionsAmount - 6 {
+            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            let text = """
+Ваш результат: \(correctAnswers) из 10
+Кличество сыгранных квизов: \(statisticService.gamesCount)
+Рекорд: \(statisticService.bestGame.correct ) /\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+"""
+            let alertModel: AlertModel = AlertModel(
+                title: "Этот раунд окончен!",
+                message: text,
+                buttonText: "Сыграть еще раз") { [weak self] in
+                    guard let self = self  else { return nil }
+                    self.currentQuestionIndex = 0
+                    return self.questionFactory?.requestNextQuestion()
+                }
+            
+            alertPresenter?.present(model: alertModel)
+            correctAnswers = 0
+        } else {
+            currentQuestionIndex += 1
+            questionFactory?.requestNextQuestion()
+        }
     }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        self.alertPresenter = AlertPresenter(viewController: self)
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
+        
+        
+//        print(NSHomeDirectory())
+//        UserDefaults.standard.set(true, forKey: "viewDidLoad")
+//        print(Bundle.main.bundlePath)
+//
+//        var fileJsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        let jsonStringfile = "top250MoviesIMDB.json"
+//        fileJsonURL.appendPathComponent(jsonStringfile)
+//        let jsonString = try! String(contentsOf: fileJsonURL)
+//        let data = jsonString.data(using: .utf8)!
+//
+//        var nedeedCrew: String
+//
+//        struct Top: Decodable {
+//            let items: [Movie]
+//        }
+//
+//        struct Actor: Decodable {
+//            let id: String
+//            let image: String
+//            let name: String
+//            let asCharacter: String
+//        }
+//
+//        struct Movie: Decodable {
+//          let id: String
+//          let rank: String
+//          let title: String
+//          let fullTitle: String
+//          let year: String
+//          let image: String
+//          let crew: String
+//          let imDbRating: String
+//          let imDbRatingCount: String
+//        }
+//
+//
+//
+//        do {
+//            let result = try JSONDecoder().decode(Top.self, from: data)
+//            nedeedCrew = result.items[0].crew
+//            print(nedeedCrew)
+//        } catch {
+//            print("Failed to parse: \(error.localizedDescription)")
+//        }
+        
         
     }
     // MARK: - QuestionFactoryDelegate
@@ -117,9 +159,4 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self.showQuestion(quiz: (self.convert(model: currentQuestion)))
         }
     }
-    // MARK: - AlertPresenterDelegate
-    func didRecieveAlertPresenter(result: AlertModel?) {
-        <#code#>
-    }
-    
 }

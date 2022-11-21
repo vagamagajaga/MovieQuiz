@@ -10,17 +10,23 @@ import UIKit
 
 final class AlertPresenter: AlertPresenterProtocol {
     
-    weak var delegate: AlertPresenterDelegate?
-    var alertController: UIAlertController
+    private weak var viewController: UIViewController?
     
-    func present(alert: AlertModel) {
-        //тут я так понимаю. мы должны вернуть alertController, собрав его перед этим
+    init(viewController: UIViewController) {
+        self.viewController = viewController
     }
-    
-    init(delegate: AlertPresenterDelegate?) {
-        self.delegate = delegate
+
+    func present(model: AlertModel) {
+        let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
+        let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in
+            model.completion()
+        })
+        alert.addAction(action)
+        viewController?.present(alert, animated: true)
     }
 }
+
+
     
     
     
