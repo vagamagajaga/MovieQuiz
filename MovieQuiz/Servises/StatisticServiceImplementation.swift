@@ -13,6 +13,7 @@ final class StatisticServiceImplementation: StatisticServiceProtocol {
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
     }
+    
     // MARK: - Constants
     private let userDefaults = UserDefaults.standard
     

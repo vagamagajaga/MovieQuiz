@@ -8,9 +8,14 @@ import Foundation
  
 class QuestionFactory: QuestionFactoryProtocol {
     
+    //MARK: - Variables
     weak var delegate: QuestionFactoryDelegate?
     
-
+    init(delegate: QuestionFactoryDelegate?) {
+        self.delegate = delegate
+    }
+    
+    //MARK: - Methods
     func requestNextQuestion() {
         
         guard let index = (0..<questions.count).randomElement() else {  // 2
@@ -22,11 +27,7 @@ class QuestionFactory: QuestionFactoryProtocol {
         delegate?.didRecieveNextQuestion(question: question)
     }
     
-    init(delegate: QuestionFactoryDelegate?) {
-        self.delegate = delegate
-    }
-    
-    // MARK: - Mock-данные
+    // MARK: - Mock data
     private let questions: [QuizQuestion] = [
         QuizQuestion(
             image: "The Godfather",

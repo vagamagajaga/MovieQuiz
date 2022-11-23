@@ -7,8 +7,6 @@
 
 import Foundation
 
-//MARK: - Protocol
-
 protocol StatisticServiceProtocol: AnyObject {
     func store(correct count: Int, total amount: Int)
     var totalAccuracy: Double { get }
