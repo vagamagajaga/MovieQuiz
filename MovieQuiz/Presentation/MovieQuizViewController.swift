@@ -3,10 +3,10 @@ import UIKit
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - Outlets
-
     @IBOutlet private weak var movieImage: UIImageView!
     @IBOutlet private weak var movieQuestion: UILabel!
     @IBOutlet private weak var movieCount: UILabel!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Variables
     private var statisticService: StatisticServiceProtocol = StatisticServiceImplementation()
@@ -31,6 +31,25 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - Methods
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() // включаем анимацию
+    }
+    
+    private func showNetworkError(message: String) {
+        func hideLoadingIndicator() {
+            activityIndicator.isHidden = true
+        }
+        let alertModel: AlertModel = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttonText: "Попробовать еще раз") { [weak self] in
+                guard let self = self  else { return nil }
+                return self.questionFactory?.requestNextQuestion() //в авторском решение указан метод gameRestart, но я не пойму откуда он берется
+            }
+        alertPresenter?.present(model: alertModel)
+    }
+    
     private func showAnswerResult(isCorrect: Bool) {
         movieImage.layer.masksToBounds = true
         movieImage.layer.borderWidth = 8
@@ -94,9 +113,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         self.alertPresenter = AlertPresenter(viewController: self)
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
+        
+        
     }
     // MARK: - QuestionFactoryDelegate
-  
     func didRecieveNextQuestion(question: QuizQuestion?) {
         
         guard let question = question else {
@@ -109,4 +129,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.showQuestion(quiz: (self.convert(model: currentQuestion)))
         }
     }
+    
+    // MARK: - Movieloader
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
+
