@@ -10,6 +10,20 @@ import Foundation
 
 
 struct MoviesLoader: MoviesLoadingProtocol {
+    // MARK: - Error
+    private enum MoviesLoaderError: LocalizedError {
+        case decodeError
+        case messageError
+        var errorDescription: String? {
+            switch self {
+            case .decodeError:
+                return "Decode Error"
+            case .messageError:
+                return "Message Error"
+            }
+        }
+    }
+    
     // MARK: - NetworkClient
     private let networkClient = NetworkClient()
     
@@ -20,17 +34,21 @@ struct MoviesLoader: MoviesLoadingProtocol {
         }
         return url
     }
-    
-    
-    
-    
-    
-    func loadMovies(handler: @escaping (Result<Movie, Error>) -> Void) {
-        networkClient.fetch(url: moviesUrl) { <#Result<Data, Error>#> in
-            <#code#>
+
+    func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
+        networkClient.fetch(url: moviesUrl) { result in
+            switch result {
+            case .failure(let error): handler(.failure(error))
+            case .success(let data):
+                do {
+                    let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    handler(.success(mostPopularMovies))
+                } catch {
+                    handler(.failure(MoviesLoaderError.decodeError))
+                }
+            }
         }
-            
-        }
-    
     }
+}
+
 
