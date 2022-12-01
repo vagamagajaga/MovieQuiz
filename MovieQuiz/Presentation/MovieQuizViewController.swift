@@ -32,14 +32,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - Methods
     private func showLoadingIndicator() {
-        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
-        activityIndicator.startAnimating() // включаем анимацию
+        activityIndicator.isHidden = false 
+        activityIndicator.startAnimating()
     }
     
     private func showNetworkError(message: String) {
-        func hideLoadingIndicator() {
-            activityIndicator.isHidden = true
-        }
+        activityIndicator.isHidden = true
+        
         let alertModel: AlertModel = AlertModel(
             title: "Ошибка",
             message: message,
@@ -112,9 +111,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         self.alertPresenter = AlertPresenter(viewController: self)
         
-        questionFactory?.loadData()
         showLoadingIndicator()
-    
+        questionFactory?.loadData()
     }
     // MARK: - QuestionFactoryDelegate
     func didRecieveNextQuestion(question: QuizQuestion?) {
