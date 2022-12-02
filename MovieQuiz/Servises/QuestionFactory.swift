@@ -17,7 +17,8 @@ class QuestionFactory: QuestionFactoryProtocol {
     
     //MARK: - Methods
     func loadData() {
-        moviesLoader.loadMovies { result in
+        moviesLoader.loadMovies { [weak self] result in
+            guard let self = self else { return }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
