@@ -120,17 +120,23 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="eJ0-Z3-ddo">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="ypBlack"/>
                         <constraints>
                             <constraint firstItem="Vtk-vg-255" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="25d-kt-3YC"/>
+                            <constraint firstItem="eJ0-Z3-ddo" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Wei-j1-NhV"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Vtk-vg-255" secondAttribute="trailing" constant="20" id="gjL-6X-jhc"/>
                             <constraint firstItem="Vtk-vg-255" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="hFY-iK-3D1"/>
+                            <constraint firstItem="eJ0-Z3-ddo" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="m7S-Fj-YLj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Vtk-vg-255" secondAttribute="bottom" id="yOs-YN-5Vh"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="eJ0-Z3-ddo" id="nE2-Qp-78W"/>
                         <outlet property="movieCount" destination="FWN-60-Y5Y" id="Qwh-cQ-ZhO"/>
                         <outlet property="movieImage" destination="Qs7-cd-Eqa" id="eYe-8f-dpw"/>
                         <outlet property="movieQuestion" destination="8dU-ca-EEV" id="MjF-ju-1Am"/>

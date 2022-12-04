@@ -9,13 +9,14 @@ import Foundation
 import UIKit
 
 final class AlertPresenter: AlertPresenterProtocol {
-    
+    // MARK: - Variables
     private weak var viewController: UIViewController?
     
     init(viewController: UIViewController) {
         self.viewController = viewController
     }
 
+    // MARK: - Methods
     func present(model: AlertModel) {
         let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
         let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in

@@ -3,10 +3,10 @@ import UIKit
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - Outlets
-
     @IBOutlet private weak var movieImage: UIImageView!
     @IBOutlet private weak var movieQuestion: UILabel!
     @IBOutlet private weak var movieCount: UILabel!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Variables
     private var statisticService: StatisticServiceProtocol = StatisticServiceImplementation()
@@ -31,6 +31,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - Methods
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false 
+        activityIndicator.startAnimating()
+    }
+    
+    private func showNetworkError(message: String) {
+        activityIndicator.isHidden = true
+        
+        let alertModel: AlertModel = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttonText: "Попробовать еще раз") { [weak self] in
+                guard let self = self  else { return nil }
+                return self.questionFactory?.loadData() 
+            }
+        alertPresenter?.present(model: alertModel)
+    }
+    
     private func showAnswerResult(isCorrect: Bool) {
         movieImage.layer.masksToBounds = true
         movieImage.layer.borderWidth = 8
@@ -49,7 +67,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
@@ -90,15 +108,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         self.alertPresenter = AlertPresenter(viewController: self)
-        questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
+        
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     // MARK: - QuestionFactoryDelegate
-  
     func didRecieveNextQuestion(question: QuizQuestion?) {
-        
         guard let question = question else {
             return
         }
@@ -109,4 +126,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.showQuestion(quiz: (self.convert(model: currentQuestion)))
         }
     }
+    
+    // MARK: - Movieloader
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
 }
+
