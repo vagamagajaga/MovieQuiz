@@ -23,7 +23,11 @@ struct MoviesLoader: MoviesLoadingProtocol {
     }
     
     // MARK: - NetworkClient
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRouting
+    
+    init(networkClient: NetworkRouting = NetworkClient()){
+        self.networkClient = networkClient
+    }
     
     // MARK: - URL
     private var moviesUrl: URL {
@@ -36,7 +40,8 @@ struct MoviesLoader: MoviesLoadingProtocol {
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
         networkClient.fetch(url: moviesUrl) { result in
             switch result {
-            case .failure(let error): handler(.failure(error))
+            case .failure(let error):
+                handler(.failure(error))
             case .success(let data):
                 guard let decodedMovies = try? JSONDecoder().decode(MostPopularMovies.self, from: data) else {
                     handler(.failure(MoviesLoaderError.decodeError))

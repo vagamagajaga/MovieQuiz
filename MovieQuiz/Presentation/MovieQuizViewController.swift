@@ -13,10 +13,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var alertPresenter: AlertPresenterProtocol?
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private let presenter = MovieQuizPresenter()
     
     private var correctAnswers: Int = 0
-    private var currentQuestionIndex: Int = 0
-    private let questionsAmount: Int = 10
+
     
     // MARK: - Actions
     @IBAction private func noButtonClicked(_ sender: UIButton) {
@@ -36,8 +36,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.startAnimating()
     }
     
-    private func showNetworkError(message: String) {
+    private func hideLoadingIndicator() {
         activityIndicator.isHidden = true
+    }
+    
+    private func showNetworkError(message: String) {
+        showLoadingIndicator()
         
         let alertModel: AlertModel = AlertModel(
             title: "Ошибка",
@@ -65,23 +69,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-    }
-    
     private func showQuestion(quiz step: QuizStepViewModel) {
         guard let currentQuestion = currentQuestion else { return }
-        movieImage.image = convert(model: currentQuestion).image
-        movieQuestion.text = convert(model: currentQuestion).question
-        movieCount.text = convert(model: currentQuestion).questionNumber
+        movieImage.image = presenter.convert(model: currentQuestion).image
+        movieQuestion.text = presenter.convert(model: currentQuestion).question
+        movieCount.text = presenter.convert(model: currentQuestion).questionNumber
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 {
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
+        if presenter.isLastIndex() {
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
             let text = """
 Ваш результат: \(correctAnswers) из 10
 Количество сыграных квизов: \(statisticService.gamesCount)
@@ -93,13 +90,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 message: text,
                 buttonText: "Сыграть еще раз") { [weak self] in
                     guard let self = self  else { return nil }
-                    self.currentQuestionIndex = 0
+                    self.presenter.resetQuestionIndex()
                     return self.questionFactory?.requestNextQuestion()
                 }
             alertPresenter?.present(model: alertModel)
             correctAnswers = 0
         } else {
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
@@ -114,8 +111,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showLoadingIndicator()
         questionFactory?.loadData()
     }
+    
     // MARK: - QuestionFactoryDelegate
-    func didRecieveNextQuestion(question: QuizQuestion?) {
+    func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
         }
@@ -123,13 +121,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             //Отличается от варианта из курса из-за отличий в изначально созданном файле
             guard let currentQuestion = self?.currentQuestion, let self = self else { return }
-            self.showQuestion(quiz: (self.convert(model: currentQuestion)))
+            self.showQuestion(quiz: (self.presenter.convert(model: currentQuestion)))
         }
     }
     
     // MARK: - Movieloader
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
+        hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
 
