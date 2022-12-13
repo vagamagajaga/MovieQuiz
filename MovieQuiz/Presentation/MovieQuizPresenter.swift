@@ -10,8 +10,10 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     var questionFactory: QuestionFactoryProtocol?
+    private let statisticService: StatisticServiceImplementation! //не понял зачем в учебнике сделали принуд. расп.
     private weak var viewController: MovieQuizViewController?
     var currentQuestion: QuizQuestion?
+    var alertPresenter: AlertPresenterProtocol?
     
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
@@ -19,6 +21,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
+        
+        self.alertPresenter = AlertPresenter(viewController: viewController)
+        
+        self.statisticService = StatisticServiceImplementation()
         
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         questionFactory?.loadData()
@@ -37,7 +43,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = isYes
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
 
     }
     
@@ -55,7 +61,9 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func didAnswer(isCorrect: Bool) {
-        correctAnswers += 1
+        if isCorrect {
+            correctAnswers += 1
+        }
     }
     
     func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -65,25 +73,35 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
+    func showAnswerResult(isCorrect: Bool) {
+        viewController?.highlightImageBorder(isCorrect: isCorrect)
+        didAnswer(isCorrect: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            
+            self.showNextQuestionOrResults()
+        }
+    }
+    
     func showNextQuestionOrResults() {
         if self.isLastIndex() {
-            guard let viewController = viewController else { return }
-            viewController.statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+            
+            statisticService.store(correct: correctAnswers, total: self.questionsAmount)
             let text = """
 Ваш результат: \(correctAnswers) из 10
-Количество сыграных квизов: \(viewController.statisticService.gamesCount)
-Рекорд: \(viewController.statisticService.bestGame.correct ) /\(viewController.statisticService.bestGame.total) (\(viewController.statisticService.bestGame.date.dateTimeString))
-Средняя точность: \(String(format: "%.2f", viewController.statisticService.totalAccuracy))%
+Количество сыграных квизов: \(statisticService.gamesCount)
+Рекорд: \(statisticService.bestGame.correct ) /\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
 """
             let alertModel: AlertModel = AlertModel(
                 title: "Этот раунд окончен!",
                 message: text,
                 buttonText: "Сыграть еще раз") { [weak self] in
                     guard let self = self  else { return nil }
-                    self.resetQuestionIndex()
-                    return self.questionFactory?.requestNextQuestion()
+                    return self.restartGame()
                 }
-            viewController.alertPresenter?.present(model: alertModel)
+            alertPresenter?.present(model: alertModel)
             correctAnswers = 0
         } else {
             self.switchToNextQuestion()

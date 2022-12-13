@@ -9,8 +9,7 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Variables
-    var statisticService: StatisticServiceProtocol = StatisticServiceImplementation()
-    var alertPresenter: AlertPresenterProtocol?
+    
     private var presenter: MovieQuizPresenter!
     
     // MARK: - Actions
@@ -41,43 +40,33 @@ final class MovieQuizViewController: UIViewController {
                 guard let self = self  else { return nil }
                 return self.presenter.questionFactory?.loadData()
             }
-        alertPresenter?.present(model: alert)
+        presenter.alertPresenter?.present(model: alert)
     }
     
-    func showAnswerResult(isCorrect: Bool) {
+    func highlightImageBorder(isCorrect: Bool) {
         movieImage.layer.masksToBounds = true
         movieImage.layer.borderWidth = 8
-        movieImage.layer.cornerRadius = 20
         movieImage.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        if isCorrect {
-            presenter.didAnswer(isCorrect: isCorrect)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            
-            self.movieImage.layer.borderWidth = 0
-            self.presenter.showNextQuestionOrResults()
-        }
+        
     }
     
     func showQuestion(quiz step: QuizStepViewModel) {
         guard let currentQuestion = presenter.currentQuestion else { return }
+        movieImage.layer.borderColor = UIColor.clear.cgColor
         movieImage.image = presenter.convert(model: currentQuestion).image
         movieQuestion.text = presenter.convert(model: currentQuestion).question
         movieCount.text = presenter.convert(model: currentQuestion).questionNumber
     }
-    
-
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        movieImage.layer.cornerRadius = 20
+        
         presenter = MovieQuizPresenter(viewController: self)
-        self.alertPresenter = AlertPresenter(viewController: self)
         
         showLoadingIndicator()
     }
-
 }
 
