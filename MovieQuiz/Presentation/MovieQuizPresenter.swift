@@ -17,15 +17,18 @@ final class MovieQuizPresenter {
     
     // MARK: - Actions
     func noButtonClicked() {
-        let givenAnswer = false
-        guard let currentQuestion = currentQuestion else { return }
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        didAnswer(isYes: false)
     }
     
     func yesButtonClicked() {
-        let givenAnswer = true
+        didAnswer(isYes: true)
+    }
+    
+    private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else { return }
+        let givenAnswer = isYes
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+
     }
     
     // MARK: - Methods
@@ -46,6 +49,44 @@ final class MovieQuizPresenter {
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
+    }
+    
+    func showNextQuestionOrResults() {
+        if self.isLastIndex() {
+            guard let viewController = viewController else { return }
+            viewController.statisticService.store(correct: viewController.correctAnswers, total: self.questionsAmount)
+            let text = """
+Ваш результат: \(viewController.correctAnswers) из 10
+Количество сыграных квизов: \(viewController.statisticService.gamesCount)
+Рекорд: \(viewController.statisticService.bestGame.correct ) /\(viewController.statisticService.bestGame.total) (\(viewController.statisticService.bestGame.date.dateTimeString))
+Средняя точность: \(String(format: "%.2f", viewController.statisticService.totalAccuracy))%
+"""
+            let alertModel: AlertModel = AlertModel(
+                title: "Этот раунд окончен!",
+                message: text,
+                buttonText: "Сыграть еще раз") { [weak self] in
+                    guard let self = self  else { return nil }
+                    self.resetQuestionIndex()
+                    return viewController.questionFactory?.requestNextQuestion()
+                }
+            viewController.alertPresenter?.present(model: alertModel)
+            viewController.correctAnswers = 0
+        } else {
+            self.switchToNextQuestion()
+            viewController?.questionFactory?.requestNextQuestion()
+        }
+    }
+    // MARK: - QuestionFactoryDelegate
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        currentQuestion = question
+        DispatchQueue.main.async { [weak self] in
+            //Отличается от варианта из курса из-за отличий в изначально созданном файле
+            guard let currentQuestion = self?.currentQuestion, let self = self else { return }
+            self.viewController?.showQuestion(quiz: (self.convert(model: currentQuestion)))
+        }
     }
     
 }
