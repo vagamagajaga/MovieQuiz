@@ -7,13 +7,23 @@
 
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: QuestionFactoryDelegate {
     
-    weak var viewController: MovieQuizViewController?
+    var questionFactory: QuestionFactoryProtocol?
+    private weak var viewController: MovieQuizViewController?
     var currentQuestion: QuizQuestion?
     
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
+    var correctAnswers: Int = 0
+    
+    init(viewController: MovieQuizViewController) {
+        self.viewController = viewController
+        
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
+        questionFactory?.loadData()
+        viewController.showLoadingIndicator()
+    }
     
     // MARK: - Actions
     func noButtonClicked() {
@@ -44,6 +54,10 @@ final class MovieQuizPresenter {
         currentQuestionIndex += 1
     }
     
+    func didAnswer(isCorrect: Bool) {
+        correctAnswers += 1
+    }
+    
     func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
@@ -54,9 +68,9 @@ final class MovieQuizPresenter {
     func showNextQuestionOrResults() {
         if self.isLastIndex() {
             guard let viewController = viewController else { return }
-            viewController.statisticService.store(correct: viewController.correctAnswers, total: self.questionsAmount)
+            viewController.statisticService.store(correct: correctAnswers, total: self.questionsAmount)
             let text = """
-Ваш результат: \(viewController.correctAnswers) из 10
+Ваш результат: \(correctAnswers) из 10
 Количество сыграных квизов: \(viewController.statisticService.gamesCount)
 Рекорд: \(viewController.statisticService.bestGame.correct ) /\(viewController.statisticService.bestGame.total) (\(viewController.statisticService.bestGame.date.dateTimeString))
 Средняя точность: \(String(format: "%.2f", viewController.statisticService.totalAccuracy))%
@@ -67,16 +81,34 @@ final class MovieQuizPresenter {
                 buttonText: "Сыграть еще раз") { [weak self] in
                     guard let self = self  else { return nil }
                     self.resetQuestionIndex()
-                    return viewController.questionFactory?.requestNextQuestion()
+                    return self.questionFactory?.requestNextQuestion()
                 }
             viewController.alertPresenter?.present(model: alertModel)
-            viewController.correctAnswers = 0
+            correctAnswers = 0
         } else {
             self.switchToNextQuestion()
-            viewController?.questionFactory?.requestNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
+    
+    func restartGame() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        questionFactory?.requestNextQuestion()
+    }
+    
     // MARK: - QuestionFactoryDelegate
+    
+    func didLoadDataFromServer() {
+        viewController?.hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        let message = error.localizedDescription
+        viewController?.showNetworkError(message: message)
+    }
+    
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
