@@ -9,20 +9,20 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
-    var questionFactory: QuestionFactoryProtocol?
+    private var questionFactory: QuestionFactoryProtocol?
     private let statisticService: StatisticServiceImplementation! //не понял зачем в учебнике сделали принуд. расп.
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MQVCProtocol?
     var currentQuestion: QuizQuestion?
     var alertPresenter: AlertPresenterProtocol?
     
-    let questionsAmount: Int = 10
+    private let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     var correctAnswers: Int = 0
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MQVCProtocol) {
         self.viewController = viewController
         
-        self.alertPresenter = AlertPresenter(viewController: viewController)
+        self.alertPresenter = AlertPresenter(viewController: viewController as! UIViewController)
         
         self.statisticService = StatisticServiceImplementation()
         

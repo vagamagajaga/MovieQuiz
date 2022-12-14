@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MQVCProtocol {
     
     //MARK: - Outlets
     @IBOutlet private weak var movieImage: UIImageView!
@@ -9,7 +9,6 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Variables
-    
     private var presenter: MovieQuizPresenter!
     
     // MARK: - Actions
@@ -38,7 +37,7 @@ final class MovieQuizViewController: UIViewController {
             message: message,
             buttonText: "Попробовать еще раз") { [weak self] in
                 guard let self = self  else { return nil }
-                return self.presenter.questionFactory?.loadData()
+                return self.presenter.restartGame()
             }
         presenter.alertPresenter?.present(model: alert)
     }
