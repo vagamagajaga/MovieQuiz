@@ -13,5 +13,6 @@ protocol MQVCProtocol: AnyObject {
     func showNetworkError(message: String)
     func highlightImageBorder(isCorrect: Bool)    
     func showQuestion(quiz step: QuizStepViewModel)
-    
+    func setButtonsEnabled(_ enabled: Bool)
+    func present(model: AlertModel)
 }

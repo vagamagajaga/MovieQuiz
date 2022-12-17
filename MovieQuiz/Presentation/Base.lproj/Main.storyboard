@@ -144,6 +144,8 @@
                         <outlet property="movieCount" destination="FWN-60-Y5Y" id="Qwh-cQ-ZhO"/>
                         <outlet property="movieImage" destination="Qs7-cd-Eqa" id="eYe-8f-dpw"/>
                         <outlet property="movieQuestion" destination="8dU-ca-EEV" id="MjF-ju-1Am"/>
+                        <outlet property="noButton" destination="Thd-pi-yP2" id="JR9-Pm-d27"/>
+                        <outlet property="yesButton" destination="P9c-cT-H7G" id="j8C-eN-Ygu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

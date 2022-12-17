@@ -147,8 +147,8 @@
 			isa = PBXGroup;
 			children = (
 				CC375FB6291691FC0007CD0B /* AlertPresenter.swift */,
-				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				CC28CCC329490072004120D1 /* MovieQuizPresenter.swift */,
+				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				AD1ABAB72831907B00B3E448 /* Main.storyboard */,
 			);
 			path = Presentation;

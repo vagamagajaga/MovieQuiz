@@ -12,18 +12,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     private let statisticService: StatisticServiceImplementation! //не понял зачем в учебнике сделали принуд. расп.
     private weak var viewController: MQVCProtocol?
-    var currentQuestion: QuizQuestion?
-    var alertPresenter: AlertPresenterProtocol?
     
+    var currentQuestion: QuizQuestion?
     private let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     var correctAnswers: Int = 0
     
     init(viewController: MQVCProtocol) {
         self.viewController = viewController
-        
-        self.alertPresenter = AlertPresenter(viewController: viewController as! UIViewController)
-        
         self.statisticService = StatisticServiceImplementation()
         
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
@@ -43,8 +39,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = isYes
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     // MARK: - Methods
@@ -73,20 +68,18 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
-    func showAnswerResult(isCorrect: Bool) {
+    func proceedWithAnswer(isCorrect: Bool) {
         viewController?.highlightImageBorder(isCorrect: isCorrect)
         didAnswer(isCorrect: isCorrect)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            
-            self.showNextQuestionOrResults()
+            self.proceedToNextQuestionOrResults()
         }
     }
     
-    func showNextQuestionOrResults() {
+    func proceedToNextQuestionOrResults() {
         if self.isLastIndex() {
-            
             statisticService.store(correct: correctAnswers, total: self.questionsAmount)
             let text = """
 Ваш результат: \(correctAnswers) из 10
@@ -101,7 +94,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                     guard let self = self  else { return nil }
                     return self.restartGame()
                 }
-            alertPresenter?.present(model: alertModel)
+            viewController?.present(model: alertModel)
             correctAnswers = 0
         } else {
             self.switchToNextQuestion()
@@ -116,7 +109,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     // MARK: - QuestionFactoryDelegate
-    
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
@@ -138,6 +130,5 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self.viewController?.showQuestion(quiz: (self.convert(model: currentQuestion)))
         }
     }
-    
 }
 

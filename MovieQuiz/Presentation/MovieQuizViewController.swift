@@ -7,9 +7,12 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
     @IBOutlet private weak var movieQuestion: UILabel!
     @IBOutlet private weak var movieCount: UILabel!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet var noButton: UIButton!
+    @IBOutlet var yesButton: UIButton!
     
     // MARK: - Variables
     private var presenter: MovieQuizPresenter!
+    private var alertPresenter: AlertPresenterProtocol!
     
     // MARK: - Actions
     @IBAction private func noButtonClicked(_ sender: UIButton) {
@@ -39,10 +42,21 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
                 guard let self = self  else { return nil }
                 return self.presenter.restartGame()
             }
-        presenter.alertPresenter?.present(model: alert)
+        alertPresenter?.present(model: alert)
+    }
+    
+    func present(model: AlertModel) {
+        let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
+        let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in
+            model.completion()
+        })
+        alert.addAction(action)
+        alert.view.accessibilityIdentifier = "alertOfResult"
+        self.present(alert, animated: true)
     }
     
     func highlightImageBorder(isCorrect: Bool) {
+        self.setButtonsEnabled(false)
         movieImage.layer.masksToBounds = true
         movieImage.layer.borderWidth = 8
         movieImage.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -51,21 +65,28 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
     
     func showQuestion(quiz step: QuizStepViewModel) {
         guard let currentQuestion = presenter.currentQuestion else { return }
+        self.setButtonsEnabled(true)
         movieImage.layer.borderColor = UIColor.clear.cgColor
         movieImage.image = presenter.convert(model: currentQuestion).image
         movieQuestion.text = presenter.convert(model: currentQuestion).question
         movieCount.text = presenter.convert(model: currentQuestion).questionNumber
     }
+    
+    func setButtonsEnabled(_ enabled: Bool) {
+            yesButton.isEnabled = enabled
+            noButton.isEnabled = enabled
+        }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         movieImage.layer.cornerRadius = 20
+        self.setButtonsEnabled(true)
         
         presenter = MovieQuizPresenter(viewController: self)
+        alertPresenter = AlertPresenter(viewController: self)
         
         showLoadingIndicator()
     }
 }
-
