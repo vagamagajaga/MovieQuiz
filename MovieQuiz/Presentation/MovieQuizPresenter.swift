@@ -8,9 +8,9 @@
 import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
-    
+    // MARK: - Variables
     private var questionFactory: QuestionFactoryProtocol?
-    private let statisticService: StatisticServiceImplementation! //не понял зачем в учебнике сделали принуд. расп.
+    private let statisticService: StatisticServiceImplementation!
     private weak var viewController: MQVCProtocol?
     
     var currentQuestion: QuizQuestion?
@@ -108,7 +108,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         questionFactory?.requestNextQuestion()
     }
     
-    // MARK: - QuestionFactoryDelegate
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
