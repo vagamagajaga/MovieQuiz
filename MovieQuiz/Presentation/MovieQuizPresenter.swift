@@ -94,7 +94,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                     guard let self = self  else { return nil }
                     return self.restartGame()
                 }
-            viewController?.present(model: alertModel)
+            viewController?.presentAlert(model: alertModel)
             correctAnswers = 0
         } else {
             self.switchToNextQuestion()

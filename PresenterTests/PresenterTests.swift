@@ -16,7 +16,7 @@ final class MovieQuizViewControllerProtocolMock: MQVCProtocol {
     func showNetworkError(message: String) { }
     func highlightImageBorder(isCorrect: Bool) { }
     func showQuestion(quiz step: QuizStepViewModel) { }
-    func present(model: AlertModel) { }
+    func presentAlert(model: AlertModel) { }
 }
 
 final class PresenterTests: XCTestCase {
@@ -34,5 +34,4 @@ final class PresenterTests: XCTestCase {
         XCTAssertEqual(viewModel.questionNumber, "1/10")
         
     }
-
 }

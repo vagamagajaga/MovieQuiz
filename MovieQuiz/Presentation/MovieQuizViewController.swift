@@ -45,7 +45,7 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
         alertPresenter?.present(model: alert)
     }
     
-    func present(model: AlertModel) {
+    func presentAlert(model: AlertModel) {
         let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
         let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in
             model.completion()
