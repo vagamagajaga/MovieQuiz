@@ -7,17 +7,17 @@
 
 import Foundation
 
-struct NetworkClient {
+struct NetworkClient: NetworkRouting {
     // MARK: - Enums
     private enum NetworkError: LocalizedError {
         case codeError
-        case urlError
+//        case urlError
         var errorDescription: String? {
             switch self {
             case .codeError:
                 return "CodeError"
-            case .urlError:
-                return "urlError"
+//            case .urlError:
+//                return "urlError"
             }
         }
     }

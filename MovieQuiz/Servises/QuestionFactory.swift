@@ -7,8 +7,9 @@ import Foundation
 class QuestionFactory: QuestionFactoryProtocol {
     //MARK: - Variables
     private let moviesLoader: MoviesLoadingProtocol
-    private var movies: [MostPopularMovie] = []
     weak var delegate: QuestionFactoryDelegate?
+    
+    private var movies: [MostPopularMovie] = []
     
     init(delegate: QuestionFactoryDelegate?, moviesLoader: MoviesLoadingProtocol) {
         self.delegate = delegate
@@ -54,7 +55,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             let text = "Рейтинг этого фильма \(moreOrLess) чем \(randomNumberForQuestion)?"
             var correctAnswer: Bool {
                 moreOrLess == "больше" ? rating > Float(randomNumberForQuestion) : rating < Float(randomNumberForQuestion)
-                }
+            }
             
             let question = QuizQuestion(
                 image: imageData,
@@ -63,9 +64,8 @@ class QuestionFactory: QuestionFactoryProtocol {
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.delegate?.didRecieveNextQuestion(question: question)
+                self.delegate?.didReceiveNextQuestion(question: question)
             }
-            
         }
     }
     // MARK: - Mock data
