@@ -46,13 +46,7 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
     }
     
     func presentAlert(model: AlertModel) {
-        let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
-        let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in
-            model.completion()
-        })
-        alert.addAction(action)
-        alert.view.accessibilityIdentifier = "alertOfResult"
-        self.present(alert, animated: true)
+        alertPresenter.present(model: model)
     }
     
     func highlightImageBorder(isCorrect: Bool) {
@@ -60,7 +54,6 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
         movieImage.layer.masksToBounds = true
         movieImage.layer.borderWidth = 8
         movieImage.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
     }
     
     func showQuestion(quiz step: QuizStepViewModel) {
