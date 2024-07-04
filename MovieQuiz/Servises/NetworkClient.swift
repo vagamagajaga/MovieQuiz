@@ -10,14 +10,16 @@ import Foundation
 struct NetworkClient: NetworkRouting {
     // MARK: - Enums
     private enum NetworkError: LocalizedError {
-        case codeError
-//        case urlError
+        case serverError(Int)
+        case noData
+        
         var errorDescription: String? {
             switch self {
-            case .codeError:
-                return "CodeError"
-//            case .urlError:
-//                return "urlError"
+         
+            case .serverError(let codeError):
+                return "ServerError: \(codeError)"
+            case .noData:
+                return "No Data"
             }
         }
     }
@@ -34,7 +36,7 @@ struct NetworkClient: NetworkRouting {
             
             if let response = response as? HTTPURLResponse,
                response.statusCode < 200 || response.statusCode >= 300 {
-                handler(.failure(NetworkError.codeError))
+                handler(.failure(NetworkError.serverError(response.statusCode)))
                 return
             }
             
@@ -42,5 +44,16 @@ struct NetworkClient: NetworkRouting {
             handler(.success(data))
         }
         task.resume()
+    }
+    
+    func fetch(url: URL) async throws -> Data {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        if let response = response as? HTTPURLResponse,
+           response.statusCode < 200 ||  response.statusCode >= 300 {
+            print(NetworkError.serverError(response.statusCode))
+        }
+        
+        return data
     }
 }

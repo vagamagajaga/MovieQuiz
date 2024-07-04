@@ -12,12 +12,18 @@ struct MoviesLoader: MoviesLoadingProtocol {
     private enum MoviesLoaderError: LocalizedError {
         case decodeError
         case loadError(message: String)
+        case urlError
+        case networkError
         var errorDescription: String? {
             switch self {
             case .decodeError:
                 return "Decode Error"
             case .loadError(let message):
                 return "Load Error: \(message)"
+            case .urlError:
+                return "UrlError"
+            case .networkError:
+                return "Network Error"
             }
         }
     }
@@ -63,30 +69,25 @@ struct MoviesLoader: MoviesLoadingProtocol {
         }
     }
     
-    func loadMoviesTrailer(id: String, handler: @escaping (Result<MoviesDetailModel, Error>) -> ()) {
-        guard let fullUrl = URL(string: trailerURL.absoluteString + id) else { return }
-        networkClient.fetch(url: fullUrl) { result in
-            switch result {
-            case .failure(let error):
-                handler(.failure(error))
-            case .success(let data):
-                guard let decodedMovie = try?
-                        JSONDecoder().decode(MoviesDetailModel.self, from: data) else {
-                    handler(.failure(LoaderErrors.jsonError))
-                    return
-                }
-                
-                if decodedMovie.errorMessage.isEmpty {
-                    handler(.success(decodedMovie))
-                } else {
-                    handler(.failure(LoaderErrors.errorMessageFromData))
-                }
-            }
+    func loadMoviesTrailerLink(id: String) async throws -> String {
+        guard let fullUrl = URL(string: trailerURL.absoluteString + id) else {
+            throw MoviesLoaderError.urlError
         }
-    }
-    
-    private enum LoaderErrors: Error {
-        case jsonError
-        case errorMessageFromData
+        
+        do {
+            let fetchData = try await networkClient.fetch(url: fullUrl)
+            
+            guard let decodedMovies = try? JSONDecoder().decode(MoviesDetailModel.self, from: fetchData) else {
+                throw MoviesLoaderError.decodeError
+            }
+            
+            if decodedMovies.errorMessage.isEmpty {
+                return decodedMovies.link
+            } else {
+                throw MoviesLoaderError.loadError(message: decodedMovies.errorMessage)
+            }
+        } catch {
+            throw MoviesLoaderError.networkError
+        }
     }
 }

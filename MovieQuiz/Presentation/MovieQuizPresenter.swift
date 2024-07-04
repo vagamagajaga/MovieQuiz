@@ -79,9 +79,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func openTrailer() {
-        questionFactory?.getTrailerLink() { link in
-            if let link, let url = URL(string: link) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        Task {
+            if let link = await questionFactory?.provideTrailerLink(),
+               let url = URL(string: link) {
+                await UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {
                 return
             }

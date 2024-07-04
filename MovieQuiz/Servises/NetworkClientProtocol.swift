@@ -9,5 +9,6 @@ import Foundation
 
 protocol NetworkRouting {
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void)
+    func fetch(url: URL) async throws -> Data
 }
 

@@ -5,9 +5,6 @@
 import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
-
-    
-    
     //MARK: - Variables
     private let moviesLoader: MoviesLoadingProtocol
     weak var delegate: QuestionFactoryDelegate?
@@ -73,21 +70,17 @@ class QuestionFactory: QuestionFactoryProtocol {
         }
     }
     
-    func getTrailerLink(completion: @escaping (String?) -> Void) {
-        moviesLoader.loadMoviesTrailer(id: (currentMovie?.id ?? "tt1375666")) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let trailerModel):
-                    completion(trailerModel.link)
-                case .failure(let error):
-                    print(error)
-                    completion(nil)
-                }
-            }
+    func provideTrailerLink() async -> String? {
+        guard let id = currentMovie?.id else { return "" }
+        
+        do {
+            let link = try await moviesLoader.loadMoviesTrailerLink(id: id)
+            return link
+        } catch {
+            return nil
         }
     }
     
-
     func getMovie() -> MostPopularMovie? {
         return currentMovie
     }

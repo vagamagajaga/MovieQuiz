@@ -1,7 +1,6 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, MQVCProtocol {
-    
     //MARK: - Outlets
     @IBOutlet private weak var movieImage: UIImageView!
     @IBOutlet private weak var movieQuestion: UILabel!
@@ -92,6 +91,4 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
         
         alertPresenter?.showAlert(model: alertModel, isNeedCancel: true)
     }
-
-
 }
