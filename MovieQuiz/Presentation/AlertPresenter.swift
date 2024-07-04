@@ -8,22 +8,23 @@
 import Foundation
 import UIKit
 
-final class AlertPresenter: AlertPresenterProtocol {
-    // MARK: - Variables
-    private weak var viewController: UIViewController?
+class AlertPresenter: AlertPresenterProtocol {
     
-    init(viewController: UIViewController) {
-        self.viewController = viewController
+    private weak var delegate: UIViewController?
+    
+    init(delegate: UIViewController?) {
+        self.delegate = delegate
     }
-
-    // MARK: - Methods
-    func present(model: AlertModel) {
+    
+    func showAlert(model: AlertModel, isNeedCancel: Bool) {
         let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
-        let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in
+        let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
             model.completion()
-        })
-        alert.addAction(action)
-        alert.view.accessibilityIdentifier = "alertOfResult"
-        viewController?.present(alert, animated: true)
+        }
+        let cancelAction = UIAlertAction(title: "Назад", style: .cancel)
+        
+        if isNeedCancel { alert.addAction(action) }
+        alert.addAction(cancelAction)
+        delegate?.present(alert, animated: true)
     }
 }

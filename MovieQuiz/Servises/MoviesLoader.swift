@@ -31,8 +31,15 @@ struct MoviesLoader: MoviesLoadingProtocol {
     
     // MARK: - URL
     private var moviesUrl: URL {
-        guard let url = URL(string: "https://imdb-api.com/en/API/Top250Movies/k_r0f51fxi") else {
+        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
             preconditionFailure("Unable to construct moviesUrl")
+        }
+        return url
+    }
+    
+    private var trailerURL: URL {
+        guard let url = URL(string: "https://tv-api.com/en/API/Trailer/k_zcuw1ytf/") else {
+            preconditionFailure("Невозможно достать значение по ссылке!")
         }
         return url
     }
@@ -55,6 +62,31 @@ struct MoviesLoader: MoviesLoadingProtocol {
             }
         }
     }
+    
+    func loadMoviesTrailer(id: String, handler: @escaping (Result<MoviesDetailModel, Error>) -> ()) {
+        guard let fullUrl = URL(string: trailerURL.absoluteString + id) else { return }
+        networkClient.fetch(url: fullUrl) { result in
+            switch result {
+            case .failure(let error):
+                handler(.failure(error))
+            case .success(let data):
+                guard let decodedMovie = try?
+                        JSONDecoder().decode(MoviesDetailModel.self, from: data) else {
+                    handler(.failure(LoaderErrors.jsonError))
+                    return
+                }
+                
+                if decodedMovie.errorMessage.isEmpty {
+                    handler(.success(decodedMovie))
+                } else {
+                    handler(.failure(LoaderErrors.errorMessageFromData))
+                }
+            }
+        }
+    }
+    
+    private enum LoaderErrors: Error {
+        case jsonError
+        case errorMessageFromData
+    }
 }
-
-

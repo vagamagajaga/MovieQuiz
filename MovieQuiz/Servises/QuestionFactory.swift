@@ -5,11 +5,15 @@
 import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
+
+    
+    
     //MARK: - Variables
     private let moviesLoader: MoviesLoadingProtocol
     weak var delegate: QuestionFactoryDelegate?
     
     private var movies: [MostPopularMovie] = []
+    private var currentMovie: MostPopularMovie?
     
     init(delegate: QuestionFactoryDelegate?, moviesLoader: MoviesLoadingProtocol) {
         self.delegate = delegate
@@ -39,7 +43,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             let index = (0..<self.movies.count).randomElement() ?? 0
             
             guard let movie = self.movies[safe: index] else { return }
-            
+            currentMovie = movie
             var imageData = Data()
             
             do {
@@ -67,6 +71,25 @@ class QuestionFactory: QuestionFactoryProtocol {
                 self.delegate?.didReceiveNextQuestion(question: question)
             }
         }
+    }
+    
+    func getTrailerLink(completion: @escaping (String?) -> Void) {
+        moviesLoader.loadMoviesTrailer(id: (currentMovie?.id ?? "tt1375666")) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let trailerModel):
+                    completion(trailerModel.link)
+                case .failure(let error):
+                    print(error)
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+
+    func getMovie() -> MostPopularMovie? {
+        return currentMovie
     }
     // MARK: - Mock data
 //    private let questions: [QuizQuestion] = [

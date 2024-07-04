@@ -78,6 +78,28 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
+    func openTrailer() {
+        questionFactory?.getTrailerLink() { link in
+            if let link, let url = URL(string: link) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                return
+            }
+        }
+    }
+    
+    func getInfoAlertModel() -> AlertModel? {
+        guard let movie = questionFactory?.getMovie() else { return nil}
+        
+        let alertModel = AlertModel(title: "Заинтересовал фильм?",
+                                    message: "Фильм называется: \(movie.title) \n Год выпуска: \(movie.year)",
+                                    buttonText: "Глянем трейлер") {
+            self.openTrailer()
+        }
+        
+        return alertModel
+    }
+    
     func proceedToNextQuestionOrResults() {
         if self.isLastIndex() {
             statisticService.store(correct: correctAnswers, total: self.questionsAmount)

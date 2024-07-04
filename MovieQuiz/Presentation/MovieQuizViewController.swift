@@ -22,6 +22,23 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
         presenter.yesButtonClicked()
     }
     
+    @IBAction func infoButtonPressed(_ sender: UIButton) {
+        getTrailerAlert()
+    }
+    
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        movieImage.layer.cornerRadius = 20
+        self.setButtonsEnabled(true)
+        
+        presenter = MovieQuizPresenter(viewController: self)
+        alertPresenter = AlertPresenter(delegate: self)
+        
+        showLoadingIndicator()
+    }
+    
     // MARK: - Methods
     func showLoadingIndicator() {
         activityIndicator.isHidden = false 
@@ -42,11 +59,11 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
                 guard let self = self  else { return nil }
                 return self.presenter.restartGame()
             }
-        alertPresenter?.present(model: alert)
+        alertPresenter?.showAlert(model: alert, isNeedCancel: false)
     }
     
     func presentAlert(model: AlertModel) {
-        alertPresenter.present(model: model)
+        alertPresenter.showAlert(model: model, isNeedCancel: true)
     }
     
     func highlightImageBorder(isCorrect: Bool) {
@@ -69,17 +86,12 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
             yesButton.isEnabled = enabled
             noButton.isEnabled = enabled
         }
-
-    // MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    
+    func getTrailerAlert() {
+        guard let alertModel = presenter.getInfoAlertModel() else { return }
         
-        movieImage.layer.cornerRadius = 20
-        self.setButtonsEnabled(true)
-        
-        presenter = MovieQuizPresenter(viewController: self)
-        alertPresenter = AlertPresenter(viewController: self)
-        
-        showLoadingIndicator()
+        alertPresenter?.showAlert(model: alertModel, isNeedCancel: true)
     }
+
+
 }

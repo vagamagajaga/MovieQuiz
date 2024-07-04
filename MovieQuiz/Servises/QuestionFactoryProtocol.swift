@@ -9,5 +9,7 @@ import Foundation
 
 protocol QuestionFactoryProtocol {
     func requestNextQuestion()
+    func getMovie() -> MostPopularMovie?
     func loadData()
+    func getTrailerLink(completion: @escaping (String?) -> Void)
 }
