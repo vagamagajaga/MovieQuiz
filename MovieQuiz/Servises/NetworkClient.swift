@@ -8,6 +8,14 @@
 import Foundation
 
 struct NetworkClient: NetworkRouting {
+    //MARK: - Variables
+    private var session: URLSession
+    
+    //MARK: - Init
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+    
     // MARK: - Enums
     private enum NetworkError: LocalizedError {
         case serverError(Int)
@@ -27,7 +35,7 @@ struct NetworkClient: NetworkRouting {
     // MARK: - Methods
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
         let request = URLRequest(url: url)
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = session.dataTask(with: request) { data, response, error in
             
             if let error = error {
                 handler(.failure(error))
@@ -46,14 +54,14 @@ struct NetworkClient: NetworkRouting {
         task.resume()
     }
     
-    func fetch(url: URL) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(from: url)
+    func fetch<DataType>(url: URL) async throws -> DataType {
+        let (data, response) = try await session.data(from: url)
         
         if let response = response as? HTTPURLResponse,
            response.statusCode < 200 ||  response.statusCode >= 300 {
             print(NetworkError.serverError(response.statusCode))
         }
         
-        return data
+        return data as! DataType
     }
 }
