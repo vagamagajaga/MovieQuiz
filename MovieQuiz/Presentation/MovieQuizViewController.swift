@@ -45,7 +45,9 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
     }
     
     func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.isHidden = true
+        }
     }
     
     func showNetworkError(message: String) {

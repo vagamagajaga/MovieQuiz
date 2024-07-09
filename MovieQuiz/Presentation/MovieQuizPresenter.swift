@@ -147,6 +147,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
         currentQuestion = question
         DispatchQueue.main.async { [weak self] in
+            self?.viewController?.hideLoadingIndicator()
             //Отличается от варианта из курса из-за отличий в изначально созданном файле
             guard let currentQuestion = self?.currentQuestion, let self = self else { return }
             self.viewController?.showQuestion(quiz: (self.convert(model: currentQuestion)))

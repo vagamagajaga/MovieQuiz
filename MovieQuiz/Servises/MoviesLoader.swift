@@ -50,22 +50,21 @@ struct MoviesLoader: MoviesLoadingProtocol {
         return url
     }
     
-    func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
-        networkClient.fetch(url: moviesUrl) { result in
-            switch result {
-            case .failure(let error):
-                handler(.failure(error))
-            case .success(let data):
-                guard let decodedMovies = try? JSONDecoder().decode(MostPopularMovies.self, from: data) else {
-                    handler(.failure(MoviesLoaderError.decodeError))
-                    return
-                }
-                if decodedMovies.errorMessage.isEmpty {
-                    handler(.success(decodedMovies))
-                } else {
-                    handler(.failure(MoviesLoaderError.loadError(message: decodedMovies.errorMessage)))
-                }
+    func loadMovies() async throws -> MostPopularMovies {
+        do {
+            let fetchData = try await networkClient.fetch(url: moviesUrl)
+            
+            guard let decodedMovies = try? JSONDecoder().decode(MostPopularMovies.self, from: fetchData) else {
+                throw MoviesLoaderError.decodeError
             }
+            
+            if decodedMovies.errorMessage.isEmpty {
+                return decodedMovies
+            } else {
+                throw MoviesLoaderError.loadError(message: decodedMovies.errorMessage)
+            }
+        } catch {
+            throw MoviesLoaderError.networkError
         }
     }
     
