@@ -8,6 +8,6 @@
 import Foundation
 
 protocol MoviesLoadingProtocol {
-    func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void)
-    func loadMoviesTrailer(id: String, handler: @escaping (Result<MoviesDetailModel, Error>) -> ())
+    func loadMovies() async throws -> MostPopularMovies
+    func loadMoviesTrailerLink(id: String) async throws -> String
 }

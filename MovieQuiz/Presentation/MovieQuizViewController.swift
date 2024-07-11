@@ -1,7 +1,6 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, MQVCProtocol {
-    
     //MARK: - Outlets
     @IBOutlet private weak var movieImage: UIImageView!
     @IBOutlet private weak var movieQuestion: UILabel!
@@ -46,7 +45,9 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
     }
     
     func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.isHidden = true
+        }
     }
     
     func showNetworkError(message: String) {
@@ -92,6 +93,4 @@ final class MovieQuizViewController: UIViewController, MQVCProtocol {
         
         alertPresenter?.showAlert(model: alertModel, isNeedCancel: true)
     }
-
-
 }

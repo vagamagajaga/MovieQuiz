@@ -5,9 +5,6 @@
 import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
-
-    
-    
     //MARK: - Variables
     private let moviesLoader: MoviesLoadingProtocol
     weak var delegate: QuestionFactoryDelegate?
@@ -20,19 +17,28 @@ class QuestionFactory: QuestionFactoryProtocol {
         self.moviesLoader = moviesLoader
     }
     
+    //MARK: - Error
+    enum QuestionFactoryError: LocalizedError {
+        case loadingError
+        
+        var errorDescription: String? {
+            switch self {
+            case .loadingError:
+                return "Fail to loading data"
+            }
+        }
+    }
+    
     //MARK: - Methods
-    func loadData() {
-        moviesLoader.loadMovies { [weak self] result in
+    func loadData() -> Void {
+        Task { [weak self] in
             guard let self = self else { return }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                switch result {
-                case .success(let mostPopularMovies):
-                    self.movies = mostPopularMovies.items
-                    self.delegate?.didLoadDataFromServer()
-                case .failure(let error):
-                    self.delegate?.didFailToLoadData(with: error)
-                }
+            
+            if let movies = try? await self.moviesLoader.loadMovies().items {
+                self.movies = movies
+                self.delegate?.didLoadDataFromServer()
+            } else {
+                self.delegate?.didFailToLoadData(with: QuestionFactoryError.loadingError)
             }
         }
     }
@@ -73,21 +79,17 @@ class QuestionFactory: QuestionFactoryProtocol {
         }
     }
     
-    func getTrailerLink(completion: @escaping (String?) -> Void) {
-        moviesLoader.loadMoviesTrailer(id: (currentMovie?.id ?? "tt1375666")) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let trailerModel):
-                    completion(trailerModel.link)
-                case .failure(let error):
-                    print(error)
-                    completion(nil)
-                }
-            }
+    func provideTrailerLink() async -> String? {
+        guard let id = currentMovie?.id else { return "" }
+        
+        do {
+            let link = try await moviesLoader.loadMoviesTrailerLink(id: id)
+            return link
+        } catch {
+            return nil
         }
     }
     
-
     func getMovie() -> MostPopularMovie? {
         return currentMovie
     }

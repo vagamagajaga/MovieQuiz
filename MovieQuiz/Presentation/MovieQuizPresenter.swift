@@ -79,9 +79,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func openTrailer() {
-        questionFactory?.getTrailerLink() { link in
-            if let link, let url = URL(string: link) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        Task {
+            if let link = await questionFactory?.provideTrailerLink(),
+               let url = URL(string: link) {
+                await UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {
                 return
             }
@@ -146,6 +147,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
         currentQuestion = question
         DispatchQueue.main.async { [weak self] in
+            self?.viewController?.hideLoadingIndicator()
             //Отличается от варианта из курса из-за отличий в изначально созданном файле
             guard let currentQuestion = self?.currentQuestion, let self = self else { return }
             self.viewController?.showQuestion(quiz: (self.convert(model: currentQuestion)))
